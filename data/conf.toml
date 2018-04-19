@@ -1,0 +1,8 @@
+[once.test]
+    actions = ["echo", "'hello'"]
+
+[[watch]]
+    name = "test_1"
+    do_before = ["test"]
+    actions = ["/home/user/..", "-dev"]
+    do_after = ["test"]
