@@ -3,23 +3,25 @@ use super::conf;
 
 // TODO: Add threads.
 pub fn start_watching(targets: conf::Config) {
-    let mut once_map: HashMap<String, conf::OnceConf> = HashMap::new();
+    let mut once_map: HashMap<String, Vec<String>> = HashMap::new();
 
     // Handle `once` items.
     match targets.once {
         Some(list) => {
             list.into_iter().for_each(|(task_name, task)| {
-                if task.deferred == Some(true) {
-                    println!("skip task: {}", task_name);
-                } else {
-                    match task.actions {
-                        Some(ref actions) => {
-                            handle_once(&task_name, actions);
+                let mut deferred = false;
+                if task.deferred == Some(true) { deferred = true; }
+                match task.actions {
+                    Some(actions) => {
+                        if !deferred {
+                            handle_once(&task_name, &actions);
+                        } else {
+                            println!("skip task: {}", task_name);
                         }
-                        _ => ()
+                        once_map.insert(task_name, actions);
                     }
+                    _ => ()
                 }
-                once_map.insert(task_name, task);
             })
         },
         _ => ()
