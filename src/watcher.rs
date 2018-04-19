@@ -9,8 +9,7 @@ pub fn start_watching(targets: conf::Config) {
     match targets.once {
         Some(list) => {
             list.into_iter().for_each(|(task_name, task)| {
-                let mut deferred = false;
-                if task.deferred == Some(true) { deferred = true; }
+                let mut deferred = task.deferred == Some(true);
                 match task.actions {
                     Some(actions) => {
                         if !deferred {
