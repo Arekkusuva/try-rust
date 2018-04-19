@@ -25,6 +25,7 @@ pub fn start_watching(targets: conf::Config) {
         },
         _ => ()
     }
+
     // Handle `watch` items.
 }
 
