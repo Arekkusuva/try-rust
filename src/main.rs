@@ -9,6 +9,8 @@ use log4rs::append::file::FileAppender;
 use log4rs::encode::pattern::PatternEncoder;
 use log4rs::config::{Appender, Config, Root};
 use std::path::Path;
+use std::thread;
+use std::sync::mpsc;
 
 mod conf;
 mod watcher;
@@ -16,9 +18,20 @@ mod watcher;
 fn main() {
     let conf_path = Path::new("./data/conf.toml");
     initiate_log();
+    let conf = conf::parse(conf_path);
+    let (tx, rx) = mpsc::channel();
 
-    let targets = conf::parse(conf_path);
-    watcher::start_watching(targets);
+    thread::spawn(move || {
+        let w = watcher::Watcher::new(conf);
+        w.show();
+
+        let val = String::from("hi");
+        tx.send(val).unwrap();
+    });
+
+    for received in rx {
+        println!("Received {}", received);
+    }
 }
 
 fn initiate_log() {
